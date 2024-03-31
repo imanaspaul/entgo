@@ -261,7 +261,7 @@ func (uq *UserQuery) Clone() *UserQuery {
 // Example:
 //
 //	var v []struct {
-//		Age int `json:"Age,omitempty"`
+//		Age int `json:"user_age"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -284,7 +284,7 @@ func (uq *UserQuery) GroupBy(field string, fields ...string) *UserGroupBy {
 // Example:
 //
 //	var v []struct {
-//		Age int `json:"Age,omitempty"`
+//		Age int `json:"user_age"`
 //	}
 //
 //	client.User.Query().

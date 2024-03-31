@@ -3,6 +3,8 @@
 package ent
 
 import (
+	"time"
+
 	"github.com/imanaspaul/todoapp/ent/schema"
 	"github.com/imanaspaul/todoapp/ent/user"
 )
@@ -13,12 +15,18 @@ import (
 func init() {
 	userFields := schema.User{}.Fields()
 	_ = userFields
-	// userDescAge is the schema descriptor for Age field.
+	// userDescAge is the schema descriptor for age field.
 	userDescAge := userFields[0].Descriptor()
-	// user.AgeValidator is a validator for the "Age" field. It is called by the builders before save.
+	// user.AgeValidator is a validator for the "age" field. It is called by the builders before save.
 	user.AgeValidator = userDescAge.Validators[0].(func(int) error)
-	// userDescName is the schema descriptor for Name field.
-	userDescName := userFields[1].Descriptor()
-	// user.DefaultName holds the default value on creation for the Name field.
-	user.DefaultName = userDescName.Default.(string)
+	// userDescCreatedAt is the schema descriptor for created_at field.
+	userDescCreatedAt := userFields[2].Descriptor()
+	// user.DefaultCreatedAt holds the default value on creation for the created_at field.
+	user.DefaultCreatedAt = userDescCreatedAt.Default.(func() time.Time)
+	// userDescUpdatedAt is the schema descriptor for updated_at field.
+	userDescUpdatedAt := userFields[3].Descriptor()
+	// user.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	user.DefaultUpdatedAt = userDescUpdatedAt.Default.(time.Time)
+	// user.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	user.UpdateDefaultUpdatedAt = userDescUpdatedAt.UpdateDefault.(func() time.Time)
 }

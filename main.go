@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 
@@ -10,7 +11,7 @@ import (
 )
 
 func main() {
-	client, err := ent.Open("sqlite3", "file:ent?mode=memory&cache=shared&_fk=1")
+	client, err := ent.Open("sqlite3", "db.sqlite3?mode=memory&cache=shared&_fk=1")
 
 	if err != nil {
 		log.Fatalf("failed to open a connection to sqlite3 %v", err)
@@ -21,21 +22,13 @@ func main() {
 	if err := client.Schema.Create(context.Background()); err != nil {
 		log.Fatalf("Failed to creating scheam resources, %v", err)
 	}
-	user, err := createUser(context.Background(), client)
+	user, err := GetUser(context.Background(), client)
 	if err != nil {
 		log.Fatalf("Failed to create the user %v", err)
 	}
-	fmt.Println(user)
-}
-
-func createUser(ctx context.Context, client *ent.Client) (*ent.User, error) {
-
-	u, err := client.User.Create().SetAge(20).SetName("Manas").Save(ctx)
-
+	res_user, err := json.Marshal(user)
 	if err != nil {
-		log.Fatalf("Error creatig the user %v", err)
-		return nil, err
+		log.Fatal(err)
 	}
-
-	return u, nil
+	fmt.Println(string(res_user))
 }

@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -27,14 +28,14 @@ func (uu *UserUpdate) Where(ps ...predicate.User) *UserUpdate {
 	return uu
 }
 
-// SetAge sets the "Age" field.
+// SetAge sets the "age" field.
 func (uu *UserUpdate) SetAge(i int) *UserUpdate {
 	uu.mutation.ResetAge()
 	uu.mutation.SetAge(i)
 	return uu
 }
 
-// SetNillableAge sets the "Age" field if the given value is not nil.
+// SetNillableAge sets the "age" field if the given value is not nil.
 func (uu *UserUpdate) SetNillableAge(i *int) *UserUpdate {
 	if i != nil {
 		uu.SetAge(*i)
@@ -42,23 +43,29 @@ func (uu *UserUpdate) SetNillableAge(i *int) *UserUpdate {
 	return uu
 }
 
-// AddAge adds i to the "Age" field.
+// AddAge adds i to the "age" field.
 func (uu *UserUpdate) AddAge(i int) *UserUpdate {
 	uu.mutation.AddAge(i)
 	return uu
 }
 
-// SetName sets the "Name" field.
+// SetName sets the "name" field.
 func (uu *UserUpdate) SetName(s string) *UserUpdate {
 	uu.mutation.SetName(s)
 	return uu
 }
 
-// SetNillableName sets the "Name" field if the given value is not nil.
+// SetNillableName sets the "name" field if the given value is not nil.
 func (uu *UserUpdate) SetNillableName(s *string) *UserUpdate {
 	if s != nil {
 		uu.SetName(*s)
 	}
+	return uu
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (uu *UserUpdate) SetUpdatedAt(t time.Time) *UserUpdate {
+	uu.mutation.SetUpdatedAt(t)
 	return uu
 }
 
@@ -69,6 +76,7 @@ func (uu *UserUpdate) Mutation() *UserMutation {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (uu *UserUpdate) Save(ctx context.Context) (int, error) {
+	uu.defaults()
 	return withHooks(ctx, uu.sqlSave, uu.mutation, uu.hooks)
 }
 
@@ -94,11 +102,19 @@ func (uu *UserUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (uu *UserUpdate) defaults() {
+	if _, ok := uu.mutation.UpdatedAt(); !ok {
+		v := user.UpdateDefaultUpdatedAt()
+		uu.mutation.SetUpdatedAt(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (uu *UserUpdate) check() error {
 	if v, ok := uu.mutation.Age(); ok {
 		if err := user.AgeValidator(v); err != nil {
-			return &ValidationError{Name: "Age", err: fmt.Errorf(`ent: validator failed for field "User.Age": %w`, err)}
+			return &ValidationError{Name: "age", err: fmt.Errorf(`ent: validator failed for field "User.age": %w`, err)}
 		}
 	}
 	return nil
@@ -125,6 +141,9 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := uu.mutation.Name(); ok {
 		_spec.SetField(user.FieldName, field.TypeString, value)
 	}
+	if value, ok := uu.mutation.UpdatedAt(); ok {
+		_spec.SetField(user.FieldUpdatedAt, field.TypeTime, value)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{user.Label}
@@ -145,14 +164,14 @@ type UserUpdateOne struct {
 	mutation *UserMutation
 }
 
-// SetAge sets the "Age" field.
+// SetAge sets the "age" field.
 func (uuo *UserUpdateOne) SetAge(i int) *UserUpdateOne {
 	uuo.mutation.ResetAge()
 	uuo.mutation.SetAge(i)
 	return uuo
 }
 
-// SetNillableAge sets the "Age" field if the given value is not nil.
+// SetNillableAge sets the "age" field if the given value is not nil.
 func (uuo *UserUpdateOne) SetNillableAge(i *int) *UserUpdateOne {
 	if i != nil {
 		uuo.SetAge(*i)
@@ -160,23 +179,29 @@ func (uuo *UserUpdateOne) SetNillableAge(i *int) *UserUpdateOne {
 	return uuo
 }
 
-// AddAge adds i to the "Age" field.
+// AddAge adds i to the "age" field.
 func (uuo *UserUpdateOne) AddAge(i int) *UserUpdateOne {
 	uuo.mutation.AddAge(i)
 	return uuo
 }
 
-// SetName sets the "Name" field.
+// SetName sets the "name" field.
 func (uuo *UserUpdateOne) SetName(s string) *UserUpdateOne {
 	uuo.mutation.SetName(s)
 	return uuo
 }
 
-// SetNillableName sets the "Name" field if the given value is not nil.
+// SetNillableName sets the "name" field if the given value is not nil.
 func (uuo *UserUpdateOne) SetNillableName(s *string) *UserUpdateOne {
 	if s != nil {
 		uuo.SetName(*s)
 	}
+	return uuo
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (uuo *UserUpdateOne) SetUpdatedAt(t time.Time) *UserUpdateOne {
+	uuo.mutation.SetUpdatedAt(t)
 	return uuo
 }
 
@@ -200,6 +225,7 @@ func (uuo *UserUpdateOne) Select(field string, fields ...string) *UserUpdateOne 
 
 // Save executes the query and returns the updated User entity.
 func (uuo *UserUpdateOne) Save(ctx context.Context) (*User, error) {
+	uuo.defaults()
 	return withHooks(ctx, uuo.sqlSave, uuo.mutation, uuo.hooks)
 }
 
@@ -225,11 +251,19 @@ func (uuo *UserUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (uuo *UserUpdateOne) defaults() {
+	if _, ok := uuo.mutation.UpdatedAt(); !ok {
+		v := user.UpdateDefaultUpdatedAt()
+		uuo.mutation.SetUpdatedAt(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (uuo *UserUpdateOne) check() error {
 	if v, ok := uuo.mutation.Age(); ok {
 		if err := user.AgeValidator(v); err != nil {
-			return &ValidationError{Name: "Age", err: fmt.Errorf(`ent: validator failed for field "User.Age": %w`, err)}
+			return &ValidationError{Name: "age", err: fmt.Errorf(`ent: validator failed for field "User.age": %w`, err)}
 		}
 	}
 	return nil
@@ -272,6 +306,9 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	}
 	if value, ok := uuo.mutation.Name(); ok {
 		_spec.SetField(user.FieldName, field.TypeString, value)
+	}
+	if value, ok := uuo.mutation.UpdatedAt(); ok {
+		_spec.SetField(user.FieldUpdatedAt, field.TypeTime, value)
 	}
 	_node = &User{config: uuo.config}
 	_spec.Assign = _node.assignValues
